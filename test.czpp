@@ -1,25 +1,124 @@
-vypis("=" * 40)
-vypis("🚀 cz++ JE PRIPRAVENO PRO GITHUB A x86!")
-vypis("=" * 40)
+nacti os
+nacti sys jako system
 
-trida Hrac:
+vypis("=" * 50)
+vypis("🚀 KOMPLEXNI ZATEZOVY TEST JAZYKA cz++ 🚀")
+vypis("=" * 50)
+
+# --- 1. ZÁKLADY A LOGIKA ---
+vypis("\n[1] Logika a promenne")
+test_pravda = Pravda
+test_nepravda = Nepravda
+test_nic = Nic
+
+pokud test_pravda a ne test_nepravda:
+    vypis("- Operatory 'a', 'ne', 'Pravda', 'Nepravda' funguji.")
+
+pokud test_nic je Nic a test_pravda neni Nepravda:
+    vypis("- Operatory 'je' a 'neni' funguji.")
+
+
+# --- 2. DATOVÉ TYPY A PŘETYPOVÁNÍ ---
+vypis("\n[2] Datove typy")
+cislo_text = "42"
+skutecne_cislo = cele_cislo(cislo_text)
+text_z_cisla = text(skutecne_cislo)
+vypis(f"- Pretypovani: Cislo je {skutecne_cislo}, delka jeho textu je {delka(text_z_cisla)}")
+
+
+# --- 3. PODMÍNKY A CYKLY ---
+vypis("\n[3] Podminky a cykly")
+pro i v rozmezi(1, 5):
+    pokud i == 1:
+        preskoc
+    nebo_pokud i == 2:
+        pokracuj
+    jinak:
+        vypis(f"- Cyklus 'pro' bezi na cisle: {i}")
+        pokud i == 3:
+            prerus
+
+pocitadlo = 0
+dokud pocitadlo < 2:
+    pocitadlo += 1
+vypis(f"- Cyklus 'dokud' probehl {pocitadlo} krat.")
+
+
+# --- 4. SEZNAMY (LISTY) ---
+vypis("\n[4] Seznamy a jejich metody")
+muj_seznam = seznam()
+muj_seznam.pridej(3)
+muj_seznam.pridej(1)
+muj_seznam.pridej(2)
+muj_seznam.serad()
+odebrano = muj_seznam.odeber()
+vypis(f"- Serazeno a odebrano (melo by byt 3): {odebrano}, zbytek: {muj_seznam}")
+muj_seznam.vycisti()
+vypis(f"- Vycisteny seznam: {muj_seznam}")
+
+
+# --- 5. SLOVNÍKY (DICTIONARIES) ---
+vypis("\n[5] Slovniky")
+data = slovnik()
+data["jmeno"] = "Termux"
+data["verze"] = 1
+pro klic, hodnota v data.polozky():
+    vypis(f"- {klic}: {hodnota}")
+vypis(f"- Klice slovniku: {seznam(data.klice())}")
+
+
+# --- 6. PRÁCE S TEXTEM ---
+vypis("\n[6] Prace s textem")
+veta = "ahoj svete"
+veta = veta.velka_pismena()
+veta = veta.nahrad("SVETE", "CZ++")
+slova = veta.rozdel(" ")
+spojeno = "-".spoj(slova)
+vypis(f"- Upraveny text: {spojeno}")
+
+
+# --- 7. FUNKCE ---
+vypis("\n[7] Funkce")
+definuj secti(a, b):
+    vrat a + b
+vypis(f"- Vysledek funkce secti(10, 5) = {secti(10, 5)}")
+
+
+# --- 8. VÝJIMKY ---
+vypis("\n[8] Vyjimky (Try/Except)")
+zkus:
+    vyvolej ValueError("Schvalne vyvolana chyba!")
+chyt ValueError jako chyba:
+    vypis(f"- Chyba uspesne chycena: {chyba}")
+konecne:
+    vypis("- Blok 'konecne' se vykonal.")
+
+
+# --- 9. SOUBORY (WITH OPEN) ---
+vypis("\n[9] Prace se soubory")
+soubor_jmeno = "docasny_test.txt"
+s otevri(soubor_jmeno, "w") jako f:
+    f.write("Test souboru uspesny!")
+
+s otevri(soubor_jmeno, "r") jako f:
+    obsah = f.read()
+    vypis(f"- Precteno ze souboru: {obsah}")
+os.remove(soubor_jmeno)
+
+
+# --- 10. OBJEKTY (OOP) ---
+vypis("\n[10] Objektove programovani (Tridy)")
+trida Robot:
     definuj __zacatek__(ja, jmeno):
         ja.jmeno = jmeno
-        ja.inventar = seznam()
     
-    definuj seber_vec(ja, vec):
-        ja.inventar.pridej(vec)
-        vypis(f"{ja.jmeno} sebral: {vec}")
+    definuj pracuj(ja):
+        vrat f"Robot {ja.jmeno} je pripraven k akci!"
 
-    definuj ukaz_inventar(ja):
-        vypis(f"Inventar hrace {ja.jmeno}: {spoj(', ', ja.inventar)}")
+muj_robot = Robot("Karel")
+vypis(f"- {muj_robot.pracuj()}")
 
-hrdinove = ["Karel", "Pepa"]
-hrdinove.pridej("Lojza")
 
-hrac1 = Hrac(hrdinove[0])
-hrac1.seber_vec("Mec")
-hrac1.seber_vec("Stit")
-hrac1.ukaz_inventar()
-
-vypis("✅ Vse funguje skvele!")
+vypis("\n" + "=" * 50)
+vypis("✅ VSECHNY FUNKCE JAZYKA BYLY USPESNE OTESTOVANY! ✅")
+vypis("=" * 50)
