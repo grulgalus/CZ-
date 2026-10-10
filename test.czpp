@@ -1,0 +1,25 @@
+vypis("=" * 40)
+vypis("🚀 cz++ JE PRIPRAVENO PRO GITHUB A x86!")
+vypis("=" * 40)
+
+trida Hrac:
+    definuj __zacatek__(ja, jmeno):
+        ja.jmeno = jmeno
+        ja.inventar = seznam()
+    
+    definuj seber_vec(ja, vec):
+        ja.inventar.pridej(vec)
+        vypis(f"{ja.jmeno} sebral: {vec}")
+
+    definuj ukaz_inventar(ja):
+        vypis(f"Inventar hrace {ja.jmeno}: {spoj(', ', ja.inventar)}")
+
+hrdinove = ["Karel", "Pepa"]
+hrdinove.pridej("Lojza")
+
+hrac1 = Hrac(hrdinove[0])
+hrac1.seber_vec("Mec")
+hrac1.seber_vec("Stit")
+hrac1.ukaz_inventar()
+
+vypis("✅ Vse funguje skvele!")
