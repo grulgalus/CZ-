@@ -12,8 +12,8 @@ Kód se píše v češtině (soubory `.czpp`). Transpiler `czpp.py` ho před spu
         definuj pozdrav(ja):
             vypis(f"Ahoj, ja jsem {ja.jmeno}")
 
-        muj_robot = Robot("Karel")
-        muj_robot.pozdrav()
+    muj_robot = Robot("Karel")
+    muj_robot.pozdrav()
 
 ## Instalace a spuštění
 1. Stáhněte si repo.
