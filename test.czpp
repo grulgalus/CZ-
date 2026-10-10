@@ -12,7 +12,7 @@ test_nepravda = Nepravda
 test_nic = Nic
 
 pokud test_pravda a ne test_nepravda:
-    vypis("- Operatory 'a', 'ne', 'Pravda', 'Nepravda' funguji.")
+    vypis("- Operatory logiky funguji skvele.")
 
 pokud test_nic je Nic a test_pravda neni Nepravda:
     vypis("- Operatory 'je' a 'neni' funguji.")
@@ -23,7 +23,7 @@ vypis("\n[2] Datove typy")
 cislo_text = "42"
 skutecne_cislo = cele_cislo(cislo_text)
 text_z_cisla = text(skutecne_cislo)
-vypis(f"- Pretypovani: Cislo je {skutecne_cislo}, delka jeho textu je {delka(text_z_cisla)}")
+vypis(f"- Pretypovani: Cislo je {skutecne_cislo}, delka textu je {delka(text_z_cisla)}")
 
 
 # --- 3. PODMÍNKY A CYKLY ---
@@ -45,14 +45,14 @@ vypis(f"- Cyklus 'dokud' probehl {pocitadlo} krat.")
 
 
 # --- 4. SEZNAMY (LISTY) ---
-vypis("\n[4] Seznamy a jejich metody")
+vypis("\n[4] Seznamy a metody")
 muj_seznam = seznam()
 muj_seznam.pridej(3)
 muj_seznam.pridej(1)
 muj_seznam.pridej(2)
 muj_seznam.serad()
 odebrano = muj_seznam.odeber()
-vypis(f"- Serazeno a odebrano (melo by byt 3): {odebrano}, zbytek: {muj_seznam}")
+vypis(f"- Serazeno, odebrano (melo by byt 3): {odebrano}, zbytek: {muj_seznam}")
 muj_seznam.vycisti()
 vypis(f"- Vycisteny seznam: {muj_seznam}")
 
@@ -79,8 +79,8 @@ vypis(f"- Upraveny text: {spojeno}")
 
 # --- 7. FUNKCE ---
 vypis("\n[7] Funkce")
-definuj secti(a, b):
-    vrat a + b
+definuj secti(x, y):
+    vrat x + y
 vypis(f"- Vysledek funkce secti(10, 5) = {secti(10, 5)}")
 
 
