@@ -6,7 +6,7 @@ Kód se píše v češtině (soubory `.czpp`). Transpiler `czpp.py` ho před spu
 
 ## Ukázka kódu
 python
-trida Robot:
+trida Robot:´´´
     definuj __zacatek__(ja, jmeno):
         ja.jmeno = jmeno
     
@@ -15,7 +15,7 @@ trida Robot:
 
     muj_robot = Robot("Karel")
     muj_robot.pozdrav()
-
+´´´
 
 ## Instalace a spuštění
 1. Stáhněte si repo.
