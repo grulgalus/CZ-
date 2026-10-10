@@ -3,7 +3,7 @@ import os
 import re
 
 if len(sys.argv) < 2:
-    print("Chyba: Zadej soubor! Použití: czpp <soubor.czpp> (nebo python czpp.py <soubor>)")
+    print("Chyba: Zadej soubor! Použití: czpp <soubor.czpp>")
     sys.exit(1)
 
 soubor = sys.argv[1]
@@ -15,9 +15,7 @@ if not os.path.exists(soubor):
 with open(soubor, 'r', encoding='utf-8') as f:
     kod = f.read()
 
-# OBROVSKÉ ROZŠÍŘENÍ JAZYKA
 slovnik = {
-    # Základy a logika
     r'\bvypis\b': 'print', r'\bvstup\b': 'input', r'\bdelka\b': 'len',
     r'\btext\b': 'str', r'\bcele_cislo\b': 'int', r'\bseznam\b': 'list',
     r'\bslovnik\b': 'dict', r'\botevri\b': 'open',
@@ -30,11 +28,7 @@ slovnik = {
     r'\bzkus\b': 'try', r'\bchyt\b': 'except', r'\bkonecne\b': 'finally',
     r'\bvyvolej\b': 'raise', r'\bpreskoc\b': 'pass', r'\bprerus\b': 'break',
     r'\bpokracuj\b': 'continue', r'\bjako\b': 'as', r'\bs\b': 'with',
-    
-    # OOP (Objektově orientované programování)
     r'\btrida\b': 'class', r'\bja\b': 'self', r'\b__zacatek__\b': '__init__',
-    
-    # Metody (seznamy a texty)
     r'\bpridej\b': 'append', r'\bodeber\b': 'pop', r'\bvycisti\b': 'clear',
     r'\bnahrad\b': 'replace', r'\brozdel\b': 'split', r'\bspoj\b': 'join',
     r'\bmala_pismena\b': 'lower', r'\bvelka_pismena\b': 'upper',
