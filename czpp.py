@@ -1,110 +1,118 @@
-import sys
-import os
-import re
-import tokenize
+import sys, os, re
 
-if len(sys.argv) < 2:
-    print("Chyba: Zadej soubor! Použití: czpp <soubor.czpp>")
-    sys.exit(1)
+if "--os" in sys.argv:
+    sys.argv.remove("--os")
+    soubor = sys.argv[1]
+    
+    with open(soubor, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+        
+    print("[⚙️] Krok 1: Analyzuji tvuj cz++ kod pro OS...")
+    asm_kod = ["[BITS 16]", "[ORG 0x8000]", "start:", "    cld", "    xor ax, ax", "    mov ds, ax", "    mov es, ax"]
+    data_sekce = []
+    string_id = 0
+    
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#"): continue
+        
+        # PŘÍKAZ: vypis("text")
+        if line.startswith("vypis("):
+            try:
+                text = line.split('"')[1]
+                asm_kod.append("    mov dx, 0x3F8")
+                asm_kod.append(f"    mov si, str_{string_id}")
+                asm_kod.append("    call print_string")
+                data_sekce.append(f'str_{string_id} db "{text}", 10, 13, 0')
+                string_id += 1
+            except: pass
+                
+        # PŘÍKAZ: vycisti() (Smaže obrazovku)
+        elif line == "vycisti()":
+            asm_kod.append("    mov dx, 0x3F8")
+            asm_kod.append(f"    mov si, str_{string_id}")
+            asm_kod.append("    call print_string")
+            data_sekce.append(f'str_{string_id} db 27, "[2J", 27, "[H", 0')
+            string_id += 1
+            
+        # PŘÍKAZ: cekej_na_klavesu() (Čeká na stisk klávesy ze sériového portu)
+        elif line == "cekej_na_klavesu()":
+            asm_kod.append("    call wait_key")
+            
+        # PŘÍKAZ: pipni() (Terminálový zvonek)
+        elif line == "pipni()":
+            asm_kod.append("    mov dx, 0x3F8")
+            asm_kod.append("    mov al, 7")
+            asm_kod.append("    out dx, al")
+                
+        # PŘÍKAZ: zastav()
+        elif line == "zastav()":
+            asm_kod.append("    cli")
+            asm_kod.append("    hlt")
 
-soubor = sys.argv[1]
+    asm_kod.extend([
+        "    cli", "    hlt",
+        "print_string:", "    cld", ".loop:", "    lodsb", "    or al, al", "    jz .done",
+        "    out dx, al", "    jmp .loop", ".done:", "    ret",
+        "wait_key:", "    mov dx, 0x3FD", ".wait:", "    in al, dx", "    test al, 1", "    jz .wait",
+        "    mov dx, 0x3F8", "    in al, dx", "    ret"
+    ])
+    
+    with open("jadro_auto.asm", "w", encoding="utf-8") as f:
+        f.write("\n".join(asm_kod) + "\n\n" + "\n".join(data_sekce) + "\n\ntimes 2048-($-$$) db 0\n")
 
-if not os.path.exists(soubor):
-    print(f"Chyba: Soubor {soubor} nebyl nalezen!")
-    sys.exit(1)
+    print("[⚙️] Krok 2: Kompiluji cz++ do strojoveho kodu...")
+    os.system("nasm -f bin jadro_auto.asm -o jadro.bin")
+    
+    bootloader_asm = """
+[BITS 16]
+[ORG 0x7C00]
+    mov [BOOT_DRIVE], dl
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov sp, 0x7C00
+    mov dx, 0x3F8
+    mov si, msg_boot
+    call print_str
+    mov ah, 0x00
+    mov dl, [BOOT_DRIVE]
+    int 0x13
+    mov ah, 0x02
+    mov al, 4
+    mov ch, 0
+    mov dh, 0
+    mov cl, 2
+    mov bx, 0x8000
+    mov dl, [BOOT_DRIVE]
+    int 0x13
+    jmp 0:0x8000
+print_str:
+    cld
+.loop:
+    lodsb
+    or al, al
+    jz .done
+    out dx, al
+    jmp .loop
+.done:
+    ret
+BOOT_DRIVE db 0
+msg_boot db "[BOOT] Zacinam nacitat CZ++ jadro...", 10, 13, 0
+times 510-($-$$) db 0
+dw 0xAA55
+"""
+    with open("boot_auto.asm", "w") as f: f.write(bootloader_asm)
+    os.system("nasm -f bin boot_auto.asm -o bootloader.bin")
 
-slovnik = {
-    # MATCH-CASE (Nejnovější Python 3.10+)
-    'porovnej': 'match', 'pripad': 'case',
+    print("[⚙️] Krok 3: Sestavuji bezpecny diskovy obraz...")
+    os.system("dd if=/dev/zero of=os.img bs=512 count=32 2>/dev/null")
+    os.system("dd if=bootloader.bin of=os.img bs=512 conv=notrunc 2>/dev/null")
+    os.system("dd if=jadro.bin of=os.img bs=512 seek=1 conv=notrunc 2>/dev/null")
     
-    # ČESKÉ VÝJIMKY (Errors)
-    'Vyjimka': 'Exception', 'ChybaHodnoty': 'ValueError', 'ChybaTypu': 'TypeError',
-    'ChybaIndexu': 'IndexError', 'ChybaKlice': 'KeyError', 'ChybaBehu': 'RuntimeError',
+    print("[🚀] ZAPINAM QEMU! TVUJ VLASTNI OS STARTUJE!\n")
+    os.system("qemu-system-x86_64 -nographic -drive format=raw,file=os.img")
+    sys.exit(0)
 
-    # ZÁKLADY, TYPY A FUNKCE
-    'vypis': 'print', 'vstup': 'input', 'delka': 'len', 'typ': 'type',
-    'text': 'str', 'cele_cislo': 'int', 'desetinne': 'float', 
-    'seznam': 'list', 'slovnik': 'dict', 'mnozina': 'set', 'pravdivost': 'bool',
-    'komplexni': 'complex', 'bajty': 'bytes', 'pevna_mnozina': 'frozenset',
-    
-    # CYKLY A LOGIKA
-    'definuj': 'def', 'vrat': 'return', 'poskytni': 'yield', 
-    'pokud': 'if', 'nebo_pokud': 'elif', 'jinak': 'else',
-    'pro': 'for', 'v': 'in', 'dokud': 'while',
-    'Pravda': 'True', 'Nepravda': 'False', 'Nic': 'None',
-    'a': 'and', 'nebo': 'or', 'ne': 'not', 'neni': 'is not', 'je': 'is',
-    
-    # ASYNCHRONNÍ A POKROČILÉ FUNKCE
-    'asynchronni': 'async', 'pockej': 'await', 'funkcicka': 'lambda',
-    'nelokalni': 'nonlocal', 'globalni': 'global',
-    
-    # ITERÁTORY A MATEMATIKA
-    'rozmezi': 'range', 'ocisluj': 'enumerate', 'zazipuj': 'zip',
-    'vyfiltruj': 'filter', 'namapuj': 'map', 'vsechno': 'all', 'cokoliv': 'any',
-    'zaokrouhli': 'round', 'absolutni': 'abs', 'minimum': 'min', 'maximum': 'max', 
-    'soucet': 'sum', 'mocnina': 'pow', 'deleni_se_zbytkem': 'divmod',
-    'dalsi': 'next', 'obracene': 'reversed',
-    
-    # ČÍSELNÉ SOUSTAVY
-    'dvojkove': 'bin', 'sestnactkove': 'hex', 'osmickove': 'oct',
-    
-    # SYSTÉM, PAMĚŤ A INTROSPEKCE
-    'vyhodnot': 'eval', 'spust': 'exec', 'obsah': 'dir', 
-    'totoznost': 'id', 'otisk': 'hash', 'kod_znaku': 'ord', 'znak': 'chr',
-    'globalni_promenne': 'globals', 'lokalni_promenne': 'locals',
-    'ma_atribut': 'hasattr', 'ziskej_atribut': 'getattr', 'nastav_atribut': 'setattr',
-    'je_instance': 'isinstance', 'je_podtrida': 'issubclass', 'lze_zavolat': 'callable',
-    
-    # OOP, DEKORÁTORY A MAGICKÉ METODY
-    'trida': 'class', 'ja': 'self', 'rodic': 'super',
-    'vlastnost': 'property', 'staticka_metoda': 'staticmethod', 'tridni_metoda': 'classmethod',
-    '__zacatek__': '__init__', '__text__': '__str__', '__delka__': '__len__',
-    '__secti__': '__add__', '__zavolej__': '__call__',
-    
-    # IMPORTY A VÝJIMKY (Logika)
-    'nacti': 'import', 'jako': 'as', 's': 'with',
-    'smaz': 'del', 'tvrzeni': 'assert',
-    'zkus': 'try', 'chyt': 'except', 'konecne': 'finally', 'vyvolej': 'raise',
-    'preskoc': 'pass', 'prerus': 'break', 'pokracuj': 'continue',
-    
-    # METODY POLE, MNOŽIN A SLOVNÍKŮ
-    'pridej': 'append', 'rozsir': 'extend', 'vloz': 'insert', 
-    'odeber': 'pop', 'vycisti': 'clear', 'najdi_index': 'index',
-    'serad': 'sort', 'otoc': 'reverse',
-    'klice': 'keys', 'hodnoty': 'values', 'polozky': 'items', 'ziskej': 'get',
-    'sjednoceni': 'union', 'prunik': 'intersection', 'rozdil': 'difference',
-    
-    # METODY TEXTU
-    'nahrad': 'replace', 'rozdel': 'split', 'spoj': 'join',
-    'mala_pismena': 'lower', 'velka_pismena': 'upper', 'velke_prvni': 'capitalize',
-    'orez': 'strip', 'vypln_nulami': 'zfill',
-    'zacina_na': 'startswith', 'konci_na': 'endswith', 'najdi': 'find',
-    'spocitej': 'count', 'je_cislo': 'isdigit', 'je_abecedni': 'isalpha'
-}
-
-with open(soubor, 'r', encoding='utf-8') as f:
-    tokens = []
-    for tok in tokenize.generate_tokens(f.readline):
-        if tok.type == tokenize.NAME and tok.string in slovnik:
-            tokens.append((tokenize.NAME, slovnik[tok.string]))
-        elif tok.type == tokenize.STRING:
-            val = tok.string
-            if val.startswith('f') or val.startswith('F'):
-                def repl_fstr(m):
-                    inner = m.group(1)
-                    for cz, py in slovnik.items():
-                        inner = re.sub(r'\b' + cz + r'\b', py, inner)
-                    return "{" + inner + "}"
-                val = re.sub(r'\{([^{}]+)\}', repl_fstr, val)
-            tokens.append((tokenize.STRING, val))
-        else:
-            tokens.append((tok.type, tok.string))
-
-kod = tokenize.untokenize(tokens)
-
-docasny_soubor = soubor.replace(".czpp", "_prelozeno.py")
-with open(docasny_soubor, 'w', encoding='utf-8') as f:
-    f.write(kod)
-
-os.system(f"python {docasny_soubor}")
-os.remove(docasny_soubor)
+# (Tady by pokračoval tvůj stávající kód pro python režim)

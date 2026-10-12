@@ -1,0 +1,23 @@
+zahrn <iostream>
+standardni
+
+cele_cislo hlavni() {
+    vypis << "========================================" << konec_radku;
+    vypis << "🔥 cz++ KOMPILOVANY BARE-METAL REZIM 🔥" << konec_radku;
+    vypis << "========================================" << konec_radku;
+    
+    cele_cislo pamet = 1024;
+    znak verze = 'A';
+    
+    vypis << "Nacitam hardware procesoru..." << konec_radku;
+    vypis << "Dostupna pamet RAM: " << pamet << " MB" << konec_radku;
+    
+    cele_cislo pocitadlo = 0;
+    dokud (pocitadlo < 3) {
+        vypis << "Startuji jadro systemu (Boot " << pocitadlo << ")..." << konec_radku;
+        pocitadlo = pocitadlo + 1;
+    }
+    
+    vypis << "Systemove jadro nacteno!" << konec_radku;
+    vrat 0;
+}
