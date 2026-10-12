@@ -1,0 +1,26 @@
+name: CZ++ Core Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Stáhnutí repozitáře
+      uses: actions/checkout@v3
+
+    - name: Nastavení Pythonu
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Test interpretovaného režimu (Python backend)
+      run: python czpp.py tests/python_mod/zakladni_test.czpp
+
+    # Poznámka: OS režim (--os) netestujeme automaticky, 
+    # protože QEMU by čekalo na uživatelský vstup a zaseklo by CI/CD pipeline.
