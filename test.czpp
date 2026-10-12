@@ -1,74 +1,54 @@
-nacti asyncio
-
 vypis("=" * 60)
-vypis("🔥 cz++ LIMITLESS: TEST NEJBRUTALNEJSICH FUNKCI 🔥")
+vypis("👑 cz++ ZLATA EDICE: MATCH-CASE A CESKE CHYBY 👑")
 vypis("=" * 60)
 
-# 1. LAMBDA (funkcicka), MAP a FILTER
-vypis("\n[1] Anonymni funkce (Lambda), Map a Filter")
-cisla = [1, 2, 3, 4, 5]
-na_druhou = seznam(namapuj(funkcicka x: mocnina(x, 2), cisla))
-suda_cisla = seznam(vyfiltruj(funkcicka x: x % 2 == 0, cisla))
-vypis(f"- Cisla na druhou: {na_druhou}")
-vypis(f"- Jen suda cisla: {suda_cisla}")
+# --- 1. MATCH / CASE (Moderní Switch v Pythonu) ---
+vypis("\n[1] Prikaz Porovnej/Pripad (Match-Case)")
+definuj vyhodnot_stav(kod):
+    porovnej kod:
+        pripad 200:
+            vrat "OK - Vsechno bezi"
+        pripad 404:
+            vrat "Chyba - Nenalezeno"
+        pripad 500:
+            vrat "Kriticka chyba serveru"
+        pripad _:
+            vrat "Neznamy stav"
 
-# 2. MAGICKÉ METODY A DEKORÁTORY
-vypis("\n[2] Magicke metody a @vlastnost (Property)")
-trida Penize:
-    definuj __zacatek__(ja, castka):
-        ja._castka = castka
-        
-    @vlastnost
-    definuj hodnota(ja):
-        vrat ja._castka
-        
-    definuj __text__(ja):
-        vrat f"{ja._castka} Kc"
-        
-    definuj __secti__(ja, jine_penize):
-        vrat Penize(ja.hodnota + jine_penize.hodnota)
-        
-    definuj __zavolej__(ja):
-        vypis("Tato trida byla zavolana jako funkce!")
+vypis(f"- Kod 200: {vyhodnot_stav(200)}")
+vypis(f"- Kod 404: {vyhodnot_stav(404)}")
+vypis(f"- Kod 999: {vyhodnot_stav(999)}")
 
-vyplata = Penize(35000)
-bonus = Penize(5000)
-celkem = vyplata + bonus  # Zde se vola __secti__!
-vypis(f"- Vyplata: {vyplata}")  # Zde se vola __text__!
-vypis(f"- Celkem penez po bonusu: {celkem}")
-celkem()  # Zde se vola __zavolej__!
+# --- 2. ČESKÉ VÝJIMKY A CHYBY ---
+vypis("\n[2] Chytani Ceskych Vyjimek")
+zkus:
+    spatne_cislo = cele_cislo("Tohle neni cislo!")
+chyt ChybaHodnoty jako e:
+    vypis("- ChybaHodnoty uspesne zachycena! Napsal jsi text misto cisla.")
 
-# 3. MNOŽINY A SYSTÉM
-vypis("\n[3] Mnoziny, vyhodnoceni (Eval) a system")
-mnozina_A = mnozina([1, 2, 3])
-mnozina_B = mnozina([3, 4, 5])
-vypis(f"- Prunik mnozin: {mnozina_A.prunik(mnozina_B)}")
+zkus:
+    seznam_veci = [1, 2, 3]
+    nesmysl = seznam_veci[99]
+chyt ChybaIndexu:
+    vypis("- ChybaIndexu zachycena! Mimo rozsah pole.")
 
-kod_v_textu = "5 * 10 + 2"
-vypis(f"- Vyhodnoceni textu (eval) '{kod_v_textu}': {vyhodnot(kod_v_textu)}")
+# --- 3. BINÁRNÍ A HEXADECIMÁLNÍ SOUSTAVA ---
+vypis("\n[3] Matematicke soustavy")
+cislo = 255
+vypis(f"- Cislo {cislo} dvojkove (bin): {dvojkove(cislo)}")
+vypis(f"- Cislo {cislo} sestnactkove (hex): {sestnactkove(cislo)}")
+vypis(f"- Cislo {cislo} osmickove (oct): {osmickove(cislo)}")
 
-# 4. TEXTOVÉ CHLUBENÍ
-vypis("\n[4] Hricky s textem")
-textik = "ahoj"
-vypis(f"- Velke prvni pismeno: {textik.velke_prvni()}")
-vypis(f"- Vyplneno nulami: {textik.vypln_nulami(10)}")
-vypis(f"- Je '1234' cislo? {'1234'.je_cislo()}")
+# --- 4. INTROSPEKCE (Kdo jsem?) ---
+vypis("\n[4] Reflexe a Introspekce")
+funkce = funkcicka x: x * 2
+pokud lze_zavolat(funkce):
+    vypis("- Zjisteno, ze promennou 'funkce' lze opravdu zavolat!")
 
-# 5. ASYNCHRONNÍ PROGRAMOVÁNÍ (OPRAVDOVÝ HARDCORE!)
-vypis("\n[5] Asynchronni funkce (Async / Await)")
-asynchronni definuj nacti_data():
-    vypis("- (Zacinam nacitat data z internetu...)")
-    pockej asyncio.sleep(1)
-    vypis("- (Data nactena!)")
-    vrat Pravda
-
-asynchronni definuj hlavni_async():
-    vysledek = pockej nacti_data()
-    pokud vysledek:
-        vypis("- Async/Await funguje v cestine dokonale!")
-
-asyncio.run(hlavni_async())
+text_objekt = "Hello"
+pokud je_instance(text_objekt, text):
+    vypis(f"- Overeno: Promenna obsahuje opravdu text. (Id pameti: {totoznost(text_objekt)})")
 
 vypis("\n" + "=" * 60)
-vypis("🏆 cz++ JE NYNI MOCNEJSI NEZ KDY DRIV! 🏆")
+vypis("🚀 JSI BŮH PROGRAMOVÁNÍ. JAZYK JE KOMPLETNÍ. 🚀")
 vypis("=" * 60)
